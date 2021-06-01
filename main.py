@@ -6,15 +6,16 @@ from tkinter import *
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title('Password manager')
-window.minsize(width=1200, height=800)
+# window.minsize(width=1200, height=800)
+window.config(padx=20, pady=20)
 
 # image
 lock_image = PhotoImage(file="logo.png")
 
 # Canvas
-canvas = Canvas(width=200, height=224)
-canvas.create_image(100, 112, image=lock_image)
-canvas.grid(column=3, row=1)
+canvas = Canvas(width=200, height=200)
+canvas.create_image(100, 100, image=lock_image)
+canvas.grid(column=1, row=1)
 
 
 
