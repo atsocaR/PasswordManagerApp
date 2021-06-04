@@ -19,7 +19,6 @@ def generate_password():
 
     password_list = password_letters + password_symbols + password_numbers
     shuffle(password_list)
-
     password = "".join(password_list)
     password_entry.insert(0, password)
     pyperclip.copy(str(password))
@@ -40,7 +39,6 @@ def save():
     website = website_entry.get()
     email = email_username_entry.get()
     password = password_entry.get()
-
     new_data = {
         website: {
             "email": email,
@@ -59,10 +57,26 @@ def save():
         else:
             data.update(new_data)
             write_info(new_data)
-
         finally:
             website_entry.delete(0, END)
             password_entry.delete(0, END)
+
+
+# ---------------------------- FIND PASSWORD ------------------------------- #
+def search_password():
+    website = website_entry.get()
+    try:
+        with open("data.json") as data_file:
+            data = json.load(data_file)
+    except FileNotFoundError:
+        messagebox.showinfo(title="Error", message="No Data File Found.")
+    else:
+        if website in data:
+            email = data[website]["email"]
+            password = data[website]["password"]
+            messagebox.showinfo(title=website, message=f"Email:{email} \n\n Password:{password}")
+        else:
+            messagebox.showinfo(title=website, message=f"No details for {website} exists.")
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -82,29 +96,26 @@ canvas.grid(column=1, row=0)
 # Labels
 website_label = Label(text='Website:')
 website_label.grid(column=0, row=1)
-
 email_username_label = Label(text='Email/Username:')
 email_username_label.grid(column=0, row=2)
-
 password_label = Label(text='Password:')
 password_label.grid(column=0, row=3)
 
 # entries
-website_entry = Entry(width=35)
+website_entry = Entry(width=17)
 website_entry.focus()
-website_entry.grid(column=1, row=1, columnspan=2)
-
+website_entry.grid(column=1, row=1, columnspan=1)
 email_username_entry = Entry(width=35)
 email_username_entry.insert(0, 'atsoca_ragde@hotmail.com')
 email_username_entry.grid(column=1, row=2, columnspan=2)
-
 password_entry = Entry(width=17)
 password_entry.grid(column=1, row=3, columnspan=1)
 
 # buttons
 generate_password_btn = Button(text='Generate Password', command=generate_password)
 generate_password_btn.grid(column=2, row=3, columnspan=1)
-
+search_btn = Button(text='Search', width=15, command=search_password)
+search_btn.grid(column=2, row=1, columnspan=1)
 add_btn = Button(text='Add', width=35, command=save)
 add_btn.grid(column=1, row=4, columnspan=2)
 
