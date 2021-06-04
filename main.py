@@ -1,6 +1,8 @@
 from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
+import pyperclip
+import json
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
@@ -12,33 +14,55 @@ def generate_password():
     symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
     password_letters = [choice(letters) for _ in range(randint(8, 10))]
-    password_numbers = [choice(letters) for _ in range(randint(2, 4))]
-    password_symbols = [choice(letters) for _ in range(randint(2, 4))]
+    password_numbers = [choice(numbers) for _ in range(randint(2, 4))]
+    password_symbols = [choice(symbols) for _ in range(randint(2, 4))]
 
     password_list = password_letters + password_symbols + password_numbers
     shuffle(password_list)
 
     password = "".join(password_list)
     password_entry.insert(0, password)
-    print(f"Your password is: {password}")
+    pyperclip.copy(str(password))
 
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
+def write_info(info):
+    try:
+        with open("data.json", "w") as data_file:
+            json.dump(info, data_file, indent=4)
+    except RuntimeError:
+        messagebox.showerror(title="Error", message="There was an error trying to saving the info.")
+    else:
+        messagebox.showinfo(message="The information was successfully added to the password store.")
+
+
 def save():
     website = website_entry.get()
     email = email_username_entry.get()
     password = password_entry.get()
 
-    if len(website) == 0 or len(email) == 0 or len(password) == 0:
-        messagebox.showinfo(message="Please fill the empty fields")
-    else:
-        is_ok = messagebox.askquestion(message="Are the entered data Ok?")
+    new_data = {
+        website: {
+            "email": email,
+            "password": password,
+        }
+    }
 
-        if is_ok:
-            with open('data.txt', 'a') as data_file:
-                data_file.write(f"{website} ~ {email} ~ {password} \n")
-                website_entry.delete(0, END)
-                password_entry.delete(0, END)
+    if len(website) == 0 or len(email) == 0 or len(password) == 0:
+        messagebox.showinfo(title= "Oops", message="Please fill the empty fields")
+    else:
+        try:
+            with open("data.json", "r") as data_file:
+                data = json.load(data_file)
+        except FileNotFoundError:
+            write_info(new_data)
+        else:
+            data.update(new_data)
+            write_info(new_data)
+
+        finally:
+            website_entry.delete(0, END)
+            password_entry.delete(0, END)
 
 
 # ---------------------------- UI SETUP ------------------------------- #
